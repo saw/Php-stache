@@ -1,6 +1,0 @@
-<h2>Deploy</h2>
-<p>This is where you deploy</p>
-<form action="/deploy" method="post" id="deployForm" accept-charset="utf-8">
-    <input type="hidden" name="data" value="true" id="data">
-    <p><input type="submit" name="go" value="Go"></p>
-</form>

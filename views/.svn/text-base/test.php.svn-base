@@ -1,3 +1,0 @@
-<p>This is a test module</p>
-<p>It works well</p>
-<?=$this->data['str']?>

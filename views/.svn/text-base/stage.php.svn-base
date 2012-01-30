@@ -1,6 +1,0 @@
-<h2>Stage?</h2>
-<p>This is where you stage</p>
-<form action="/stage" method="post" id="stageForm" accept-charset="utf-8">
-    <input type="hidden" name="data" value="true" id="data">
-    <p><input type="submit" name="go" value="Go"></p>
-</form>
