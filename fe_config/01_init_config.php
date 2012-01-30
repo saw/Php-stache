@@ -3,11 +3,6 @@
 /**
  * I hate config files! 
  * but the time has come that they make sense.
- * This borrows somewhat from the pattern on the site, but in this case 
- * we use the "setConf" method of the App object
- * 
- * At some point some of these are going
- * to become yinst variables (get_env()...)
  */
  
  //
