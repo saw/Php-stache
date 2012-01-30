@@ -1,0 +1,105 @@
+<?php
+
+class Controller_PollEvents extends Controller {
+	
+	public $dataOnly = true;
+	public $eventStream;
+	
+	protected function prepareData(){
+	    
+	    $events = new Model_Events();
+		
+		$this->data = array();
+		$this->processEvents();
+		$len = count($this->eventStream);
+		if($len > 0){
+		    $this->data['events'] = $this->eventStream;
+		}else{
+		    $this->data['events'] = array();
+		}
+		
+		
+		
+	}
+	
+	//too much massaging! This needs more...uh thought
+	protected function processEvents(){
+	    
+	    $log = new Model_Events();
+		$stage = new Model_Stage();
+		$deploy = new Model_Deploy();
+		$block = new Model_Blocks();
+		
+		$stageRunning = $stage->isRunning();
+		$deployRunning = $deploy->isRunning();
+		
+		$messages = $log->getEvents(10);
+	    
+	    $lastId = $this->request->lastevent;
+
+
+		foreach($messages as $message){
+            // echo($message->id .' ' .$lastId . "<br><br>");
+
+		    if($message->id > $lastId){
+                // error_log($message->id - $lastId);
+                $message->time = date('Y-m-d H:i:s');
+                // $message->message .= $lastId;
+                $message->owner = $message->owner->user_id;
+        	    $this->eventStream[] = $message;
+	        }
+		}
+
+		//this part picks up the status type events (time is 0)
+	    $stageStatus = array(
+	      
+	      'logLevel' => LogLevel::HIDDEN,
+	      'source'   => 'stage',
+	      'owner'    => 'system',
+	      'title'    => 'stagerunning', 
+	      'message'  => ($stageRunning ? 'true' : 'false' ),
+	      'time'     =>  0
+	    );
+
+		$this->eventStream[] = $stageStatus;
+		
+		$deployStatus = array(
+		  
+	      'logLevel' => LogLevel::HIDDEN,
+	      'source'   => 'deploy',
+	      'owner'    => 'system',
+	      'title'    => 'deployrunning', 
+	      'message'  => ($deployRunning ? 'true' : 'false' ),
+	      'time'     =>  0
+		);
+		
+		$this->eventStream[] = $deployStatus;
+		if($block->hardBlock || $block->softBlock){
+		    
+		    $blockStatus = array(
+		      'logLevel' => LogLevel::HIDDEN,
+		      'source' => 'block',
+		      'owner' => 'system',
+		      'title' => 'block',
+		      'message' => ($block->hardBlock ? 'hard' : 'soft'),
+		      'time'  => 0
+		    );
+		    
+		    $this->eventStream[] = $blockStatus;
+		}else{
+		    
+		    $blockStatus = array(
+		      'logLevel' => LogLevel::HIDDEN,
+		      'source' => 'block',
+		      'owner' => 'system',
+		      'title' => 'block',
+		      'message' => 'unblock',
+		      'time'  => 0
+		    );
+		    
+		    $this->eventStream[] = $blockStatus;
+		}
+		
+	}
+	
+}

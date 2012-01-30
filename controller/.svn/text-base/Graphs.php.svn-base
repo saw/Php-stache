@@ -1,0 +1,21 @@
+<?php
+
+class Controller_Graphs extends Controller {
+	
+	protected function prepareData(){
+		//its a list of graphs!
+		$graphlist = App::getInstance()->getConf('graphs');
+		
+		$this->data['graphs'] = array();
+		
+		foreach($graphlist as $graph){
+		    $this->data['graphs'][] = TemplateParser::parse('graph.html', $graph);
+		}
+		
+		$mod = new YuiModule('graphs');
+        $mod->setInitCode("Y.graphs.init(Y.one('.graph-holder'), PC);");
+        App::getInstance()->addYuiModule($mod);
+
+	}
+	
+}

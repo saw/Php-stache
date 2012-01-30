@@ -1,0 +1,92 @@
+/*jslint white: false, undef: true, browser: true, sloppy: true, eqeqeq: true, regexp: false, newcap: true, immed: true, onevar: false, plusplus: true maxerr: 50 */
+
+YUI.add('graphs', function (Y) {
+    
+    var PC, srcUrl = '/graphs', graphData = [], loaded = false,
+    
+    
+    MAXHEIGHT = 90,
+    MAXWIDTH = 277,
+    MINHEIGHT = 20;
+    
+    
+    function handleResize(e){
+        
+        var len = graphData.length;
+        
+        if(loaded){
+            loadGraphs();
+        }
+    }
+    
+    function refresh(){
+        var len = graphData.length, i;
+        
+        for (i=0; i < len; i++) {
+            graphData[i].node.setAttribute('src', graphData[i].src + "&.random=" + Math.random());
+        }
+        
+        Y.later(5000, this,  refresh);
+    }
+    
+    function loadGraph(node, src, cb){
+        var img = new Image();
+        img.src = src;
+        img.onload = function(){
+            node.setAttribute('src', src);
+            // node.setAttribute('height', MAXHEIGHT + 'px');
+            cb(this, node);
+        }
+    }
+    
+    function loadGraphs(){
+        var len = graphData.length, toGo = len, img, 
+        
+        totalWidth = Y.one('.graph-holder').get('offsetWidth') - 20, //20 px of padding
+         
+        newWidth = Math.floor(totalWidth/len),
+        
+        height = MINHEIGHT;
+        
+        if(newWidth > MAXWIDTH){
+            newWidth = MAXWIDTH;
+        }
+        
+        for (var i=0; i < len; i++) {
+            loadGraph(graphData[i].node, graphData[i].src, function(img, node){
+                --toGo;
+                node.setAttribute('width', newWidth);
+                if(node.get('offsetHeight') > height){
+                    height = node.get('offsetHeight');
+                }
+                if(toGo == 0){
+                    Y.one('.graph-holder').setStyle('height', (height + 10 ) + 'px');
+
+                    loaded = true;
+                    
+                    refresh();
+                }
+            });
+        };
+    }
+    
+    Y.graphs = {
+        init:function(pageController){
+            PC = pageController;
+            
+            var graphlist = Y.all('img.graph'), thisgraph;
+            
+            graphlist.each(function(o){
+                thisgraph = {src:o.getAttribute('data-src'), node:o};
+                graphData.push(thisgraph);
+            });
+            
+            loadGraphs();
+            Y.one('window').on('resize', Y.throttle(handleResize, 500));
+        }
+    };
+    
+
+}, '0.0.1', {
+	requires: ['yui', 'node', 'event', 'yui-throttle']
+});

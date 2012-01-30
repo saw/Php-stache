@@ -1,0 +1,41 @@
+<div id="blockbox">
+<?php if($this->data['block'] && $this->data['block']['type'] == 'hard'){
+?>    
+<div id="hardblock">
+    <h2>Deploy is <strong>hard blocked</strong> by <?=$this->data['block']['user']?></h2>
+    <p>Commit, stage and deploy is disabled. Please confirm with <?=$this->data['block']['user']?> before unblocking</p>
+    <form action="/block">
+        <input type="hidden" name="action" value="unset">
+        <p><input type="text" name="message" class="unblockmsg" size="50" placeholder="Flimsy justification for unblocking..."></p>
+        <p><input type="submit" name="unblock" value="Unblock" id="unblock"></input></p>
+    </form>
+</div>
+<?php    
+} else if($this->data['block']){
+    echo("<p>Deploy is {$this->data['block']['type']} blocked by {$this->data['block']['user']->user_id}</p>");
+    ?>
+    <form id="blockform" action="/block">
+        <input type="hidden" name="action" value="unset">
+        <p><input type="text" name="message" class="unblockmsg" size="50" placeholder="Flimsy justification for unblocking..."></p>
+        <p><label for="unblock">Unblock</label><input type="submit" name="unblock" value="Unblock"></input></p>
+        
+    </form>
+    <?php
+}else if($this->data['deployorstage']) {
+    
+?>
+    <h2>Deploy and/or Stage in progress, you can't block, even if you want too!</h2>
+<?php }else{ 
+    echo('ok to deploy!');
+    ?></p>
+    <form action="/block" id="blockform">
+        <input type="hidden" name="action" value="set"></inpu>
+        <p><select name="type">
+            <option selected value="soft">Soft</option>
+            <option value="hard">Hard</option>
+        </select></p>
+        <p><label for="message">Reason:</label><input size="50" type="text" name="message" placeholder="I am afraid." id="message"></input></p>
+        <p><input type="submit" name="submit" value="Block Deploy" id="submit"></input></p>
+    </form><?php } ?>
+    
+</div>

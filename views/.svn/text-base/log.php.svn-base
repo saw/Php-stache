@@ -1,0 +1,58 @@
+<div class="logbox mod colors showdeploy showstage showsvn showblock showmsg">
+    <form class ="controls">
+        <label for="timezone"><strong>Time zone:</strong></label>
+        <select name="timezone" id="timezone">
+            <option value="pacific">Pacific</option>
+            <option value="utc">UTC</option>
+            <option value="central">Central</option>
+            <option value="east">East</option>
+        </select>
+        <strong>Display:</strong>
+        <a href="/" data-toggle-victim="showdeploy" class="toggle deploy">deploy</a>
+        <a href="/" data-toggle-victim="showstage" class="toggle stage">stage</a>
+        <a href="/" data-toggle-victim="showsvn" class="toggle svn">svn</a>
+        <a href="/" data-toggle-victim="showblock" class="toggle block">block</a>
+        <a href="/" data-toggle-victim="showmsg" class="toggle msg">messages</a>
+        <label for="colors"><strong>Label Colors</strong></label>
+        <input type="checkbox" checked="checked" name="colors" id="colors">
+    </form>
+	<form id="messageForm" action="/log" method="post" accept-charset="utf-8">
+	    <input type="hidden" name="data" value="1"></input>
+	    <p>
+	   <input type="text" name="message" placeholder="Everyone listen to me!!" id="message">
+	    
+	   <input class="inactive" type="submit" value="Say it!"></input></p>
+	</form>
+	<div class="viewer">
+	    <ul>
+	        <?php
+	        
+	        /*
+	        
+	        $event = new stdClass();
+            $event->time = microtime(true) * 100;
+            $event->source = $source;
+            $event->owner = $owner;
+            $event->message = $message;
+            $event->logLevel = $logLevel;
+            */
+    foreach($this->data['log'] as $entry){
+        echo($entry);
+            // if($entry->logLevel !== 'INFO'){
+            //     
+            //     // $time = date('Y-m-d H:m', $entry->time);
+            //     $time = $entry->time;
+            //     // $time =  date('U',$time);
+            //     
+            //     echo("<li id=\"msg-{$entry->id}\" class=\"{$entry->source}\" data-owner=\"{$entry->owner}\" data-loglevel=\"{$entry->logLevel}\">");
+            //     echo("<span class=\"time\">{$time}</span> [{$entry->owner}] :: [{$entry->source}] {$entry->message}");
+            //     echo('</li>');
+            // }
+    }
+    	    ?>
+	    </ul>
+	</div>
+	
+
+
+</div>

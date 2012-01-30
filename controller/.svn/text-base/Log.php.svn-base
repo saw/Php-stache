@@ -1,0 +1,60 @@
+<?php
+
+class Controller_Log extends Controller {
+    
+    const cachekey = 'logentryTemplate';
+	
+	protected function prepareData(){
+		
+		$log = new Model_Events();
+		
+		//cache the template because I want to
+
+		
+		
+		//    public function addEvent($source, $owner, $message, $logLevel){
+		if($this->request->message){
+		    $log->addEvent('msg', $this->request->user, $this->request->message, LogLevel::MSG);
+			$this->data = $log->getEvents(1);
+
+		}else{
+			$myLog = $log->getEvents(100);
+            $this->data['log'] = array();
+            foreach($myLog as $event){
+                
+                $event->time = date('Y-m-d H:i:s', $event->time);
+                
+                if($event->owner->user_id !== 'root'){
+                    $cfg = array(
+                          'id' => $event->id,
+                          'source' => $event->source,
+                          'owner'  => $event->owner->user_id,
+                          'message' => $event->message,
+                          'time' => $event->time
+                    );
+                
+                
+                    $this->data['log'][] = TemplateParser::parse('logentry.html', $cfg);
+                }
+                
+            }
+            
+			$app = App::getInstance();
+			
+			$stage = new YuiModule('unifiedlog');
+            $stage->setInitCode("Y.unifiedlog.init(Y.one('.logbox'), PC);");
+
+            $app->addYuiModule($stage);
+			
+			$lastEvent = $log->getLastEvent();
+			if($lastEvent){
+			    $app->yconf['lastEventId'] = $lastEvent->id;
+			}else{
+			    $app->yconf['lastEventId'] = 0;
+			}
+			
+		}
+		
+	}
+	
+}

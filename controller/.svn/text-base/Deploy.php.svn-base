@@ -1,0 +1,41 @@
+<?php
+
+class Controller_Deploy extends Controller {
+    
+    public function doDeploy(){
+        
+		$deploy = new Model_Deploy();
+		$status = $deploy->start('saw');
+		if($status){
+		    $this->data->status = 'OK';
+		}
+    }
+    
+    protected function checkDeployStatus(){
+        $deploy = new Model_Deploy();
+        
+        $isRunning = $deploy->isRunning();
+        
+        $this->data->status = array('running' => $isRunning, 'lastStage' => $deploy->getLastStageInfo());
+    }
+	
+	protected function prepareData(){
+		
+		//    public function addEvent($source, $owner, $message, $logLevel, $title = 'misc'){
+		if($this->request->go){
+		    $this->doDeploy();
+		}else if($this->request->status){
+		    $this->checkDeployStatus();
+		}else{
+
+
+            $deploy = new YuiModule('deploy');
+            $deploy->setInitCode("Y.deploy.init(Y.one('.deploybox'), PC);");
+
+            App::getInstance()->addYuiModule($deploy);
+	    }
+		
+		
+	}
+	
+}

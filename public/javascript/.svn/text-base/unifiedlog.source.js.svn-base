@@ -1,0 +1,112 @@
+/*jslint white: false, undef: true, browser: true, sloppy: true, eqeqeq: true, regexp: false, newcap: true, immed: true, onevar: false, plusplus: true maxerr: 50 */
+
+YUI.add('unifiedlog', function (Y) {
+
+	var submitUrl, myNode, anim, entrytemplate, messageinput;
+
+	function addMessage(msg){
+		var cfg = {
+			method:"post",
+			form : {
+				id:"messageForm"
+			}
+		};
+		
+		Y.io(submitUrl, cfg);
+	}
+	
+	function toggleClass(classname){
+	    if(myNode.hasClass(classname)){
+	        myNode.removeClass(classname);
+	    }else{
+	        myNode.addClass(classname);
+	    }
+	}
+	
+	function handleDomEvents(e){
+
+	    switch(e.type){
+	        case 'click':
+	            
+	            if(e.target.test('a.toggle')){
+	                e.preventDefault();
+	                var classToToggle = e.target.getAttribute('data-toggle-victim');
+	                toggleClass(classToToggle);
+	            }
+	            break;
+	        case 'change':
+	            if(e.target.get('id') === 'colors'){
+	                toggleClass('colors');
+	            } 
+	        case 'keypress' || 'blur':
+	            if(messageinput.get('value') !== ''){
+	                Y.one('.logbox input[type="submit"]').removeClass('inactive');
+	            }else if(messageinput.get('value') === ''){
+	                Y.one('.logbox input[type="submit"]').addClass('inactive');
+	            }
+	    }
+	}
+
+	function handleEvents(o){
+		console.log('got event in ulog');
+		var ulNode = myNode.one('ul'), newNode, entryStr;
+		if(o && o.time){
+			if(o.logLevel !== 'INFO'){
+			    
+			    if(!entrytemplate){
+			        entrytemplate = Y.one('#template-logentry').get('innerHTML');
+			    }
+			    
+			    entryStr = Y.templateparser.parse(entrytemplate, o);
+			    newNode = Y.Node.create(entryStr);
+
+    			newNode.insertBefore(newNode, ulNode.get('firstChild'));
+
+		    }
+		}
+		
+
+	}
+	
+	function init(node, PC){
+		
+		node.on('submit', function(e){
+			e.preventDefault();
+			var msg = Y.one('#message').get('value');
+			addMessage(msg);
+			Y.one('#message').set('value', '');
+			Y.one('.logbox input[type="submit"]').addClass('inactive');
+		});
+
+		submitUrl = node.one('#messageForm').getAttribute('action');
+		myNode = node;
+        messageinput = myNode.one('#message');
+		
+		PC.on('pagecontroller:all', handleEvents);
+		
+		var y = Y.one('.viewer').get('offsetHeight');
+		
+		myNode.on('click', handleDomEvents);
+		myNode.on('keypress', handleDomEvents);
+		myNode.on('change', handleDomEvents);
+		
+        // anim = new Y.Anim({
+        //     node: Y.one('.viewer'),
+        //     duration: 1.5,
+        //     easing: Y.Easing.easeOut
+        // });
+		
+		// anim.set('to', { scroll: [0, Y.one('.viewer ul').get('offsetHeight')] });
+		// anim.run();
+	}
+
+	Y.unifiedlog ={
+		
+		
+		init:init,
+		addMessage:addMessage
+	};
+
+}, '0.0.1', {
+	requires: ['node', 'event', 'io-form', 'pagecontroller', 'anim', 'transition']
+});

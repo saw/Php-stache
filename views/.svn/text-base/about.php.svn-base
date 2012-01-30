@@ -1,0 +1,6 @@
+<h2>About The Deploy System</h2>
+    
+<div class="main">
+    <h3>So you want to change deploy?</h3>
+    <p>Good luck! No, actually it should not be to difficult. The front end component is a pretty simple front controller application. All requests go to public/index.php, which parses the path. Or rather, it uses the super-cool App class (<strong>lib/App.php</strong>) to handle the requests</p>
+</div>

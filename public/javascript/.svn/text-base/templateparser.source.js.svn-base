@@ -1,0 +1,28 @@
+/*jslint white: false, undef: true, browser: true, sloppy: true, eqeqeq: true, regexp: false, newcap: true, immed: true, onevar: false, plusplus: true maxerr: 50 */
+
+YUI.add('templateparser', function (Y) {
+    
+    var regex = /\{([a-z][a-z0-9]+?)\}/gi;
+    	
+	Y.templateparser = {
+		
+		parse:function(template, data){
+		    var itemName, matches = template.match(regex), len = matches.length, returnString = template;
+		    for (var i=0; i < len; i++) {
+		        itemName = matches[i].replace('{','').replace('}','');
+                // console.log(data);
+		        if(data[itemName]){
+		            returnString = returnString.replace(matches[i], data[itemName], 'g');
+		        }else{
+		            returnString = returnString.replace(matches[i], '{'+itemName+':undefined}', 'g');
+		        }
+		    }
+		    
+		    return returnString;
+		}
+		
+	}
+
+}, '0.0.1', {
+	requires: ['node', 'event']
+});

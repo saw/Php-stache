@@ -1,0 +1,12 @@
+<?php
+
+class Controller_About extends Controller {
+
+	
+	protected function prepareData(){
+	    
+	    $this->data['title'] = 'How to modify the deploy page';
+		
+	}
+	
+}

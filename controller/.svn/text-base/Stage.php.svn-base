@@ -1,0 +1,43 @@
+<?php
+
+class Controller_Stage extends Controller {
+    
+    
+    protected function doStage(){
+
+		$stage = new Model_Stage();
+		$status = $stage->start('saw');
+		
+		if($status){
+		    $this->data->status = 'OK';
+		}
+    }
+    
+    protected function checkStageStatus(){
+        $stage = new Model_Stage();
+        
+        $isRunning = $stage->isRunning();
+        
+        $this->data->status = array('running' => $isRunning, 'lastStage' => $stage->getLastStageInfo());
+    }
+	
+	protected function prepareData(){
+		
+
+		//    public function addEvent($source, $owner, $message, $logLevel, $title = 'misc'){
+		if($this->request->go){
+		    $this->doStage();
+		}else if($this->request->status){
+		    $this->checkStageStatus();
+		}else{
+	        $this->data = array('title' => 'Staging...');
+
+            $stage = new YuiModule('stage');
+            $stage->setInitCode("Y.stage.init(Y.one('.stagebox'), PC);");
+
+            App::getInstance()->addYuiModule($stage);
+	    }
+		
+	}
+	
+}

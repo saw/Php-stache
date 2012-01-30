@@ -1,0 +1,41 @@
+<?php
+/**
+ * This file defines what graphs to show on the deploy page
+ *
+ */
+
+
+
+$graphlist = array(
+    array(
+      'name'  => '500 Report',
+      'graph' => 'http://netmon101.flickr.mud.yahoo.com:9999/ganglia/graph.php?z=small&g=500_report&h=flog2.flickr.mud.yahoo.com&c=Admin&r=hour&width=200',
+      'link'  => 'http://netmon101.flickr.mud.yahoo.com:9999/ganglia/graph.php?z=large&g=500_report&h=flog2.flickr.mud.yahoo.com&c=Admin&r=hour&width=200'
+    ),
+    array(
+      'name'  => 'HYC',
+      'graph' => 'http://netmon101.flickr.mud.yahoo.com:9999/ganglia/graph.php?&c=Admin&h=flog1.flickr.mud.yahoo.com&v=0&m=hyc&r=hour&z=small&width=200',
+      'link'  => 'http://netmon101.flickr.mud.yahoo.com:9999/ganglia/graph.php?&c=Admin&h=flog1.flickr.mud.yahoo.com&m=hyc&r=hour&z=large'
+    ),
+    array(
+        'name' => 'Slow Query',
+        'graph' => 'http://netmon101.flickr.mud.yahoo.com:9999/ganglia/graph.php?&c=Admin&h=flog1.flickr.mud.yahoo.com&m=slow_query_gt_1s&r=hour&z=small',
+        'link' => 'http://netmon101.flickr.mud.yahoo.com:9999/ganglia/graph.php?&c=Admin&h=flog1.flickr.mud.yahoo.com&m=slow_query_gt_1s&r=hour&z=large'
+    ),
+    array(
+        'name' => 'WWW Cluster Load',
+        'graph' => 'http://netmon101.flickr.mud.yahoo.com:9999/ganglia/graph.php?g=load_report&z=small&c=WWW&m=&r=hour&s=descending&hc=4',
+        'link' => 'http://netmon101.flickr.mud.yahoo.com:9999/ganglia/?r=hour&s=descending&c=WWW'
+    ),
+    array(
+        'name' => 'Flaux Load',
+        'graph' => 'http://netmon101.flickr.mud.yahoo.com:9999/ganglia/graph.php?g=load_report&z=small&c=DB-Flaux&m=&r=hour&s=descending&hc=4',
+        'link' => 'http://netmon101.flickr.mud.yahoo.com:9999/ganglia/?r=hour&s=descending&c=DB-Flaux'
+    )
+);
+
+if(!isset($app)){
+    $app = App::getInstance();
+}
+$app->setConf('graphs', $graphlist);
+unset($graphlist);

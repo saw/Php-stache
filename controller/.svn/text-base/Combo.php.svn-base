@@ -1,0 +1,47 @@
+<?php
+
+//damn...bouncer
+class Controller_Combo extends Controller {
+    
+    protected $prod = false;
+    protected $outstr = '';
+	
+	protected function prepareData(){
+	    $qs = $this->request->queryString;
+	    $out = '';
+	    if(App::getInstance()->getConf('mode') == 'prod'){
+	        $this->prod = true;
+	    }
+	    
+	    
+	    
+	    if($this->prod){
+	        $out = apc_fetch($qs);
+	    }
+	    if($out == ''){
+	        error_log('rebuilding combo file...');
+	        $files = explode('&', $qs);
+	        foreach($files as $file){
+                if(!preg_match("/.v=[0-9]+/i", $file)){ //ignore cachebusters
+	                $out .= file_get_contents(__DIR__ . '/../public/javascript/' .$file . '.source.js' );
+                }
+	        }
+	        
+	        if($this->prod){
+    	        apc_store($qs, $out);
+    	    }
+    	    
+	    }
+	    
+	    $this->outstr = $out;
+
+	}
+	
+	public function renderView($viewName = false){
+	    header('Cache-Control: public');
+	    header('Content-type: application/javascript');
+	    header('Expires: Thu, 15 Apr 2019 20:00:00 GMT');
+	    echo($this->outstr);
+	}
+	
+}

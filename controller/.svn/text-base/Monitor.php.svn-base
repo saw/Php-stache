@@ -1,0 +1,46 @@
+<?php
+
+class Controller_Monitor extends Controller {
+    
+    protected $deploy;
+    protected $stage;
+    
+    public function __construct($request){
+        parent::__construct($request);
+        $this->deploy = new Model_Deploy();
+        $this->stage  = new Model_Stage();
+    }
+    
+    protected function getStageLog(){
+
+		$log = $this->stage->getLog();
+		$this->data['stagelog'] = $log;
+    }
+    
+    protected function getDeployLog(){
+
+		$log = $this->deploy->getLog();
+		$this->data['deploylog'] = $log;
+    }
+	
+	protected function prepareData(){
+		
+		$this->data = array('title' => 'Monitor!');
+		
+		$this->getDeployLog();
+		$this->getStageLog();
+		$app = App::getInstance();
+		
+		$graphs = new Controller_Graphs($this->request);
+		$graphs->execute(true);
+		$this->data['graphs'] = $graphs->getView();
+		
+		
+		$mod = new YuiModule('monitor');
+        $mod->setInitCode("Y.monitor.init(Y.one('.monitor'), PC);");
+
+        $app->addYuiModule($mod);
+		
+	}
+	
+}

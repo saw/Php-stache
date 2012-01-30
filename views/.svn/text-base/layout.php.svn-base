@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	
+	<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, user-scaleble=no"/>
+	<link rel="stylesheet" href="/css/deploy.source.css" type="text/css" media="screen" title="no title" charset="utf-8">
+	
+	<title><?php 
+	if(isset($this->data['title'])){
+		echo($this->data['title']);
+	}else{
+		echo('No title');
+	}
+	?></title>
+
+</head>
+<body<?php
+
+
+$bclass = array();
+
+if(array_key_exists('running', $this->data) && $this->data['running']) { 
+    $bclass[] = 'running';
+}
+
+if(array_key_exists('blocked', $this->data) && $this->data['blocked']) {
+    $bclass[] = $this->data['blocked'];
+}
+if(count($bclass) > 0){
+    echo(' class="'. join($bclass, ' ') . '" ');
+}
+
+
+?>>
+<div id="wrap">
+<div class="nav">
+    <?php include 'inc_deploy_nav.php'; ?>
+</div>
+    <?=$this->body;?>
+</div>
+</div>
+</body>
+<script type="text/javascript" src="http://yui.yahooapis.com/combo?3.4.0/build/yui/yui-min.js"></script>
+<?php 
+if($showYuiConf){
+
+$moduleList = array();
+
+$prod = App::getInstance()->getConf('mode') == 'prod' ? true : false;
+
+
+foreach($modules as $module){
+    if(!$prod){
+        echo("<script src=\"{$module->path}\" type=\"text/javascript\"></script>\n");
+    }
+    $moduleList[] = "{$module->name}";
+}
+
+if($prod){
+    $cachebuster = App::getInstance()->getConf('cachebust');
+    $comboStr = implode($moduleList, '&');
+    if($cachebuster){
+        $comboStr .= '&.v=' . $cachebuster;
+    }
+    echo("<script src=\"/combo?$comboStr\" type=\"text/javascript\"></script>\n");
+}
+
+?>
+<script type="text/javascript">
+    YUI({deployData:<?=$yuiconf?>}).use('<?=implode("','", $moduleList); ?>', function(Y){
+        <?php
+        foreach($modules as $module){
+            if($module->initCode){
+                echo($module->initCode . "\n");
+            }  
+        }
+        ?>
+    });
+</script>
+<?php } ?>
+
+<script id="template-confirm" type="text/x-template">
+<?php require('../minitemplates/confirm.html'); ?>
+</script>
+<script id="template-logentry" type="text/x-template">
+<?php require('../minitemplates/logentry.html'); ?>
+</script>
+</html>

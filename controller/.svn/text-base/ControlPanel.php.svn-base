@@ -1,0 +1,102 @@
+<?php
+
+class Controller_ControlPanel extends Controller {
+    
+    protected $stage;
+    protected $deploy;
+    protected $block;
+
+    protected function doStage(){
+        $this->stage->start($this->request->user);
+    }
+    
+    protected function doDeploy(){
+        $this->deploy->start($this->request->user);
+    }
+    
+    protected function doBlock(){
+
+        if(preg_match("/soft|hard/", $this->request->blocktype) && $this->request->message){
+            if($this->request->blocktype == 'soft'){
+                $this->block->setSoftBlock($this->request->user, $this->request->message);
+            }else{
+                $this->block->setHardBlock($this->request->user, $this->request->message);
+            }
+            
+        }else{
+
+            $this->data['error'] = array('type' => 'block', 'message' => 'Block requires a message');
+
+        }
+    }
+	
+	protected function unblock(){
+	    
+	    if(!$this->request->message){
+	        $this->data['error'] = array('type' => 'block', 'message' => 'Unblock requires a message');
+	        return false;
+	    }
+	    
+	    $this->block->unblock($this->request->user, $this->request->message);
+	    
+	}
+	
+	protected function prepareData(){
+	    
+	    $this->stage = new Model_Stage();
+	    $this->deploy = new Model_Deploy();
+	    $this->block = new Model_Blocks();
+	    
+        
+        switch($this->request->action){
+            case 'stage':
+                $this->doStage();
+                break;
+            case 'deploy':
+                $this->doDeploy();
+                break;
+            case 'block':
+                $this->doBlock();
+                break;
+            case 'unblock':
+                $this->unBlock();
+                break;
+        }
+    
+        //      if($this->request->action === 'stage'){
+        //     $this->doStage();
+        // }else if($this->request->action === 'deploy'){
+        //     $this->doDeploy();
+        // }else if($this->request->action === 'block'){
+        //     $this->doBlock();
+        // }
+		
+		$staging = $this->stage->isRunning();
+
+		$deploying = $this->deploy->isRunning();
+		
+        
+        $this->data['blocked'] = false;
+        
+        if($this->block->hardBlock){
+            $this->data['blocked'] = 'hard';
+        }else if($this->block->softBlock){
+            $this->data['blocked'] = 'soft';
+        }
+
+        $this->data['title'] = "Control panel";
+
+        $this->data['deploying'] = $deploying;
+        $this->data['staging'] = $staging;
+        
+        $app = App::getInstance();
+		
+		$cp = new YuiModule('controlpanel');
+        $cp->setInitCode("Y.controlPanel.init(Y.one('.controlpanel .panel'), PC);");
+
+        $app->addYuiModule($cp);
+
+		
+	}
+	
+}

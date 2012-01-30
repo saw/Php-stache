@@ -1,0 +1,15 @@
+<ul>
+<li><a href="http://tools.flickr.com/">Tools</a></li>
+<li><strong>Deploy</strong></li>
+<li><a href="http://deploy.flickr.com/view/">SVN</a></li>
+<li><a href="http://tools.flickr.com/db/">PHPMyAdmin</a></li>
+<li><a href="http://deploy.flickr.com/b2/">b2</a></li>
+<li><a href="http://deploy.flickr.com/p2/">p2</a></li>
+<li><a href="http://tools.flickr.com/db.php">DB Tools</a></li>
+<li><a href="http://tools.flickr.com/environments.php">Envs</a></li>
+<li><li><a href="http://tools.flickr.com/ops.php">Ops</a></li></li>
+<li><a href="http://tools.flickr.com/lint/">Lint</a></li>
+<li><a href="http://tools.flickr.com/docs/">Docs</a></li>
+<li><a href="http://tools.flickr.com/tinderbox/">Tinderbox</a></li>
+<li><a href="http://deploy.flickr.com/logs">Logs</a></li>
+</ul>

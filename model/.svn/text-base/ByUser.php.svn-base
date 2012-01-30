@@ -1,0 +1,44 @@
+<?php
+
+/**
+ * Model_ByUser represents the
+ * backyard user (and any extra god stuff)
+ * All properties are read only. Eveyrthing provided by by cookie
+ * is available, I just listed some commonly used
+ * properties here
+ *
+ * @property-read string $o
+ * @property-read string $employee_name
+ * @property-read string $user_id
+ * @property-read string $office_name
+ * @property-read string $timezone
+ */
+
+class Model_ByUser {
+    
+    protected $params;
+    
+    public static function getSystemUser(){
+        $conf = array('employee_name' => 'system user', 'user_id' => 'root');
+        return new Model_ByUser($conf);
+    }
+    
+    public function __construct($userData){
+        
+        $this->params = $userData;
+        
+    }
+    
+    /**
+     * Hey look, I made read-only properties.
+     */
+    public function __get($key){
+        return $this->params[$key];
+    }
+    
+    public function __set($key, $value){
+        //this is read only!
+    }
+    
+    
+}

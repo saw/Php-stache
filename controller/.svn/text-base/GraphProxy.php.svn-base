@@ -1,0 +1,42 @@
+<?php
+
+//damn...bouncer
+class Controller_GraphProxy extends Controller {
+    
+    protected $ch;
+	
+	protected function prepareData(){
+		//its a list of graphs!
+		$graphlist = App::getInstance()->getConf('graphs');
+		
+		$whitelist = array();
+		
+		$this->data['graphs'] = array();
+		
+		foreach($graphlist as $graph){
+		    $whitelist[] = $graph['graph'];
+		}
+		$url = $this->request->graph;
+		
+		if(in_array($url, $whitelist)){
+		    $ch = curl_init(); 
+    		curl_setopt($ch, CURLOPT_URL, $url); 
+            curl_setopt($ch, CURLOPT_HEADER, FALSE); 
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, FALSE);
+            $this->ch = $ch;
+		}
+		
+
+	}
+	
+	public function renderView($viewName = false){
+        if($this->ch){
+            curl_exec($this->ch);
+    		curl_close($this->ch);
+        }else{
+            echo('fail');
+        }
+		
+	}
+	
+}

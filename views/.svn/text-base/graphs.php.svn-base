@@ -1,0 +1,7 @@
+<div class="graph-holder">
+    <?php
+    foreach($this->data['graphs'] as $graph){
+        echo($graph);
+    }
+    ?>
+</div>

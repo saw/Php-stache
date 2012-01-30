@@ -1,0 +1,66 @@
+/*jslint white: false, undef: true, browser: true, sloppy: true, eqeqeq: true, regexp: false, newcap: true, immed: true, onevar: false, plusplus: true maxerr: 50 */
+
+YUI.add('monitor', function (Y) {
+    
+    var pollerHandle, myNode, stageRunning, deployRunning;
+
+
+
+    function handleEvents(e){
+
+        var nodeToChange;
+        
+        if(stageRunning){
+            nodeToChange = Y.one('.stage .output');
+        }else if(deployRunning){
+            nodeToChange = Y.one('.deploy .output');
+        }else{
+            return;
+        }
+        
+        var oldLog = nodeToChange.get('innerHTML');
+    
+        if(e.logLevel === 'INFO'){
+            oldLog = oldLog + e.message + "\n";
+            nodeToChange.set('innerHTML', oldLog);
+        }
+    }
+    
+    function handleDeployChange(e){
+        if(e.newVal === true && e.prevVal === false){
+            deployRunning = true;
+            Y.one('.deploy .output').set('innerHTML', 'Deploy started\n');
+        }else if(e.newVal === false){
+            Y.one('.deploy .output').set('innerHTML', Y.one('.deploy .output').get('innerHTML') + '\nSite deployed\n');
+            deploy = false;
+        }
+    }
+    
+    function handleStageChange(e){
+        if(e.newVal === true && e.prevVal === false){
+            stageRunning = true;
+            Y.one('.stage .output').set('innerHTML', 'Stage started\n');
+        }else if(e.newVal === false){
+            Y.one('.stage .output').set('innerHTML', Y.one('.stage .output').get('innerHTML') + '\nSite staged\n');
+            stageRunning = false;
+        }
+    }
+	
+	function init(node, PC){
+	    myNode = node;
+	    stageRunning = PC.get('stageRunning');
+        deployRunning = PC.get('deployRunning');
+        PC.on('pagecontroller:all', handleEvents);
+        PC.on('stageRunningChange', handleStageChange);
+        PC.on('deployRunningChange', handleDeployChange);
+	}
+	
+	Y.monitor = {
+		
+		init:init
+		
+	}
+
+}, '0.0.1', {
+	requires: ['node', 'event', 'io', 'pagecontroller', 'anim', 'transition']
+});

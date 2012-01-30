@@ -1,0 +1,109 @@
+/*jslint white: false, undef: true, browser: true, sloppy: true, eqeqeq: true, regexp: false, newcap: true, immed: true, onevar: false, plusplus: true maxerr: 50 */
+
+YUI.add('modal', function (Y) {
+    
+    var templateConfirm, templateAlert, confirmWrapNode, confirmCb, modalVisible = false;
+    
+    Y.on('keypress', validate);
+    
+    function validate(){
+        var msg, submit;
+        if(modalVisible){
+            console.log('validaton');
+            submit = confirmWrapNode.one('.submit');
+            msg    = confirmWrapNode.one('.message').get('value');
+            
+            if(msg){
+                submit.removeAttribute('disabled');
+            }else{
+                submit.setAttribute('disabled', true);
+            }
+            
+        }
+    }
+    
+    function showNode(){
+        confirmWrapNode.setStyle('display', 'block');
+        modalVisible = true;
+        window.setTimeout(function(){
+            confirmWrapNode.addClass('show');
+            confirmWrapNode.one('.message').focus();
+        }, 100);
+        
+    }
+    
+    function hideNode(e){
+        console.log('hide ndoe');
+        e.preventDefault();
+        modalVisible = false;
+        confirmWrapNode.removeClass('show');
+        window.setTimeout(function(){
+            confirmWrapNode.setStyle('display', 'none');
+        }, 300);
+        
+    }
+    
+    function confirm(cfg, callback){
+        
+        if(Y.UA.iphone){
+            var resp = prompt(cfg.message);
+            callback(resp);
+            return;
+        }
+        
+        confirmCb = callback;
+        
+        if(!templateConfirm){
+            templateConfirm = Y.one('#template-confirm').get('innerHTML');
+        }
+        
+        if(confirmWrapNode){
+            confirmWrapNode.one('#modal').set('innerHTML', 
+                Y.templateparser.parse(templateConfirm, cfg)
+            );
+            showNode();
+        }else{
+            var str = Y.templateparser.parse(templateConfirm, cfg);
+
+            confirmWrapNode = Y.Node.create('<div id="modalwrap"><div class="positioner"></div></div>');
+
+
+            var confirmNode = Y.Node.create('<div id="modal"></div>');
+            confirmNode.set('innerHTML', str);
+
+            confirmWrapNode.one('.positioner').appendChild(confirmNode);
+
+
+            Y.one('body').appendChild(confirmWrapNode);
+            showNode();
+            confirmWrapNode.on('click', function(e){
+  
+                if(e.target.hasClass('cancel')){
+                    hideNode(e);
+                    confirmCb(false);
+                }
+            });
+            
+            confirmWrapNode.on('submit', function(e){
+                e.preventDefault();
+                hideNode(e);
+                confirmCb(confirmWrapNode.one('.message').get('value'));
+
+            })
+            
+            confirmWrapNode.on('blur', validate);
+            
+        }
+
+    }
+  
+	
+	Y.modal = {
+		
+		confirm:confirm
+		
+	}
+
+}, '0.0.1', {
+	requires: ['node', 'event', 'templateparser']
+});

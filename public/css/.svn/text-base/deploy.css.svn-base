@@ -1,0 +1,845 @@
+/*
+(reset)
+Copyright (c) 2010, Yahoo! Inc. All rights reserved.
+Code licensed under the BSD License:
+http://developer.yahoo.com/yui/license.html
+version: 3.3.0
+build: 3167
+*/
+html{color:#000;background:#FFF;}body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,code,form,fieldset,legend,input,textarea,p,blockquote,th,td{margin:0;padding:0;}table{border-collapse:collapse;border-spacing:0;}fieldset,img{border:0;}address,caption,cite,code,dfn,em,strong,th,var{font-style:normal;font-weight:normal;}li{list-style:none;}caption,th{text-align:left;}h1,h2,h3,h4,h5,h6{font-size:100%;font-weight:normal;}q:before,q:after{content:'';}abbr,acronym{border:0;font-variant:normal;}sup{vertical-align:text-top;}sub{vertical-align:text-bottom;}input,textarea,select{font-family:inherit;font-size:inherit;font-weight:inherit;}input,textarea,select{*font-size:100%;}legend{color:#000;}
+
+
+
+/* wrap & index.php */
+html {
+	font-family: "Helvetica", arial, sans-serif;
+}
+
+.nav {
+    position: relative;
+    top:0px;
+    left:0px;
+
+}
+
+.nav li{
+    display: inline-block;
+}
+
+#hd{
+    height:160px;
+    overflow: hidden;
+    position: relative;
+}
+
+#hd .hill{
+    background:#7ec32f;
+    height:300px;
+    width:300px;
+    position: absolute;
+    overflow: hidden;
+    -webkit-border-radius: 300px;
+    -moz-border-radius: 300px;
+    border-radius: 300px;
+    -webkit-transform: scale(4, 2);
+}
+
+#hd #lhill {
+    top:170px;
+    left: -80px;
+    
+}
+
+.hard #hd .hill,
+.hard #hd #rhill{
+    background: #d0d48a;
+}
+
+#hd #rhill {
+    top:190px;
+    right: -280px;
+    background: #71b029;
+    -webkit-transform: scale(3, 2);
+}
+
+#hd .water{
+    position: absolute;
+    bottom:0px;
+    height:53px;
+    width:100%;
+    background: url(/images/waves.png) repeat-x;
+}
+
+
+#hd h1{
+    font-size: 50px;
+    font-weight:bolder;
+    color: #fff;
+    position: absolute;
+    bottom: 20px;
+    left:10px;
+}
+
+#hd .flower {
+    background-image:url('/images/flower.png');
+    position: absolute;
+/*    top:30px;*/
+    left:50px;
+    height:31px;
+    width:30px;
+    -webkit-transform: scale(0.3);
+    -mox-transform: scale(0.3);
+
+}
+
+.hard #hd .flower {
+    display: none;
+}
+
+.soft #hd .flower {
+    opacity: 0.1;
+}
+
+h2 {
+    font-size:26px;
+    font-weight:bold;
+}
+
+@-webkit-keyframes rotate {
+	0% {
+	    -webkit-transform: rotate(0deg);
+	}
+
+	100% {
+	    -webkit-transform: rotate(360deg);
+	}
+}
+
+#hd #windmill {
+    background-image:url('/images/windmill.png');
+    width: 50px;
+    height: 66px;
+    position: absolute;
+    top:30px;
+    left:150px;
+
+}
+
+#hd #windmill #blades{
+    background-image:url('/images/windmill-blades.png');
+    width: 59px;
+    height: 55px;
+    position: absolute;
+    top:-5px;
+    -webkit-transform-origin: 30px 28px;
+
+}
+
+.running #hd #windmill #blades {   
+    -webkit-animation-name: rotate;
+    -webkit-animation-timing-function: linear;
+    -webkit-animation-duration: 1s;
+	-webkit-animation-iteration-count: infinite;
+	
+}
+
+#hd #rainbow{
+    background: #ec3d2f;
+    height:400px;
+    width: 400px;
+    position: absolute;
+    right: 330px;
+    top: 10px;
+    border-radius: 200px;
+
+}
+
+/*.running #hd #rainbow {
+    top: 200px;
+    
+}*/
+
+#hd #rainbow-curtain {
+    width:400px;
+    height:400px;
+    position: absolute;
+    top:210px;
+    right:330px;
+    background: #fff;
+
+    
+    -webkit-transform-origin: 200px 0px;
+    -webkit-transform: rotate(0deg);
+    -webkit-transition: -webkit-transform 1s ease-in-out;
+}
+
+.running #hd #rainbow-curtain {
+    -webkit-transform: rotate(-180deg);
+}
+
+.hard #hd #rainbow {
+    display: none;
+}
+
+#hd #rainbow div{
+    top:5px;
+    left:5px;
+    height:100%;
+    background: #fff;
+    border-radius: 200px;
+    border: 1px solid rgba(0,0,0,0); /* not sure why this is necessary, but it is */
+    margin: 10px;
+}
+
+#hd #rainbow .r1{
+    background: #ef7035;
+}
+
+#hd #rainbow .r2{
+    background: #facb42;
+}
+
+#hd #rainbow .r3 {
+    background: #7ec42f;
+}
+
+#hd #rainbow .r4 {
+    background: #4c9bf8;
+}
+
+#hd #rainbow .r5 {
+    background: #3e79f8;
+}
+
+#hd #rainbow .r6 {
+    background: #5b52f7;
+}
+#hd #rainbow .r7 {
+    background: #fff;
+}
+
+.main {
+    position: relative;
+}
+
+
+
+.main .sec {
+    width: 48%;
+    padding: 10px;
+}
+
+.mainlog {
+    position: absolute;
+    right:0;
+    top:0;
+}
+
+.main .mod {
+    border-top: 4px solid #eee;
+}
+
+#monitor .logs {
+    position: relative;
+    overflow: auto;
+    width: 100%;
+}
+
+#monitor .log{
+    display: block;
+    float: left;
+    width: 45%;
+    min-width: 350px;
+    top: 0;
+    left: 0;
+}
+
+.controlpanel .panel {
+    background: url(http://l.yimg.com/g/images/badge_preview_bg.gif) repeat;
+    padding: 15px;
+    border: 4px solid #eee;
+}
+
+.controlpanel .panel ul {
+    overflow: auto;
+    padding-top:10px;
+}
+
+.controlpanel .panel li {
+    width: 30%;
+    margin: 0 1.5%;
+    float: left;
+}
+
+.controlpanel input {
+    -webkit-appearance: none;
+    font-size: 18px;
+    padding: 5px 20px;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 0px -1px 0px rgba(0,0,0,0.4);
+    
+    border: 0;
+    border-radius: 8px;
+    cursor: pointer;
+    max-width: 100%;
+
+}
+
+.controlpanel input[type="text"]{
+    text-shadow:none;
+    color:#000;
+    font-size: 12px;
+    font-weight: normal;
+    border-radius: 0;
+    border:1px solid #eee;
+    -webkit-appearance: textfield;
+}
+
+.yui3-js-enabled .controlpanel input[type="text"]{
+    
+    display:none;
+}
+
+
+.controlpanel .deploy {
+    color: #000;
+}
+
+.controlpanel .block {
+    color: #000;
+}
+
+.controlpanel .stage {
+    
+    color: #fff; 
+
+    background-color: #0063dc; 
+    background-image: -webkit-gradient(linear, left top, left bottom, from(#468EE6), to(#0063DC)); b
+    background-image: -moz-linear-gradient(top, #468EE6, #0063DC); 
+       
+}
+
+.controlpanel .stage:hover{ background-color: #015bcb; background-image: -webkit-gradient(linear, left top, left bottom, from(#3b79c4), to(#0154bb)); background-image: -moz-linear-gradient(top, #3b79c4, #0154bb); }
+
+.controlpanel .stage:active { background-color: #3b79c4; background-image: -webkit-gradient(linear, left top, left bottom, from(#0154bb), to(#3b79c4)); background-image: -moz-linear-gradient(top, #0154bb, #3b79c4); }
+    
+.controlpanel .diffs{ color: #fff; background-color: #62BC62; background-image: -webkit-gradient(linear, left top, left bottom, from(#97D397), to(#62BC62)); background-image: -moz-linear-gradient(top, #97D397, #62BC62); }
+
+.controlpanel .diffs:hover { background-color: #5caf5c; background-image: -webkit-gradient(linear, left top, left bottom, from(#8bc48b), to(#5caf5c)); background-image: -moz-linear-gradient(top, #8bc48b, #5caf5c); }
+
+.controlpanel .diffs:active { background-color: #8bc48b; background-image: -webkit-gradient(linear, left top, left bottom, from(#5caf5c), to(#8bc48b)); background-image: -moz-linear-gradient(top, #5caf5c, #8bc48b); }
+
+.controlpanel .deploy{ color: #000; background-color: #FFD040; background-image: -webkit-gradient(linear, left top, left bottom, from(#FFE38D), to(#FFD040)); background-image: -moz-linear-gradient(top, #FFE38D, #FFD040); }
+
+.controlpanel .deploy:hover { background-color: #f2c53e; background-image: -webkit-gradient(linear, left top, left bottom, from(#f2d785), to(#f2c53e)); background-image: -moz-linear-gradient(top, #f2d785, #f2c53e); }
+
+.controlpanel .deploy:active { background-color: #f2d785; background-image: -webkit-gradient(linear, left top, left bottom, from(#f2c53e), to(#f2d785)); background-image: -moz-linear-gradient(top, #f2c53e, #f2d785); }
+
+.controlpanel .pixie{ color: #fff; background-color: #000; background-image: -webkit-gradient(linear, left top, left bottom, from(#666), to(#000)); background-image: -moz-linear-gradient(top, #666, #000); }
+
+.controlpanel .pixie:hover { background-color: #000; background-image: -webkit-gradient(linear, left top, left bottom, from(#444), to(#000)); background-image: -moz-linear-gradient(top, #444, #000); }
+
+.controlpanel .pixie:active { background-color: #000; background-image: -webkit-gradient(linear, left top, left bottom, from(#000), to(#444)); background-image: -moz-linear-gradient(top, #000, #444); }
+
+.controlpanel .block{ color: #000; background-color: #ce9c08; background-image: -webkit-gradient(linear, left top, left bottom, from(#f5c22a), to(#ce9c08)); background-image: -moz-linear-gradient(top, #f5c22a, #ce9c08); }
+
+.controlpanel .block:hover { background-color: #bf9107; background-image: -webkit-gradient(linear, left top, left bottom, from(#e4b427), to(#bf9107)); background-image: -moz-linear-gradient(top, #e4b427, #bf9107); }
+
+.controlpanel .block:active { background-color: #e4b427; background-image: -webkit-gradient(linear, left top, left bottom, from(#bf9107), to(#e4b427)); background-image: -moz-linear-gradient(top, #bf9107, #e4b427); }
+
+.controlpanel input.unblock { background-color: #e4b427; background-image: -webkit-gradient(linear, left top, left bottom, from(#ff0707), to(#b21818)); background-image: -moz-linear-gradient(top, #bf9107, #e4b427); }
+
+
+@-webkit-keyframes throb {
+	0% {
+	    background:#eee;
+	    -webkit-box-shadow: 0px 0px 1px rgba(238,238,238,0);
+	}
+	
+	50% {
+	    background:#ccc;
+	    -webkit-box-shadow: 0px 0px 15px rgba(0,0,0,0.2);
+	}
+
+	100% {
+	    background:#eee;
+	    -webkit-box-shadow: 0px 0px 1px rgba(238,238,238,0);
+	}
+}
+
+@-webkit-keyframes throbcolor {
+	0% {
+	    background:#eee;
+	    -webkit-box-shadow: 0px 0px 1px rgba(238,238,238,0);
+	}
+	
+	50% {
+	    background:#ccc;
+	    -webkit-box-shadow: 0px 0px 5px rgba(255,255,255,1);
+	}
+
+	100% {
+	    background:#eee;
+	    -webkit-box-shadow: 0px 0px 1px rgba(238,238,238,0);
+	}
+}
+
+
+.controlpanel .stageRunning {
+/*    border: 1px solid red;*/
+}
+
+.controlpanel input[type="submit"]:disabled,
+.controlpanel .deploy:disabled {
+    text-shadow: none;
+    color:#fff;
+    opacity: 0.8;
+    background: #eee;
+    cursor:default;
+}
+
+.controlpanel .stageRunning input.stage,
+.controlpanel .deployRunning input.deploy{
+    text-shadow: none;
+    color:#fff;
+    opacity: 0.8;
+    background: #eee;
+    -webkit-animation-name: throb;
+    -webkit-animation-duration: 1s;
+    -webkit-animation-direction: alternate;
+	-webkit-animation-iteration-count: infinite;
+	-webkit-animation-timing-function: ease-in-out;
+}
+
+.controlpanel p {
+    color: #ccc;
+    font-size: 12px;
+    margin-top: 10px;
+}
+
+
+/* --modal --*/
+
+#modalwrap {
+    position: fixed;
+    top:0;
+    left:0;
+    right:0;
+    bottom:0;
+    background: rgba(0,0,0,0.4);
+    text-align:center;
+
+}
+
+#modalwrap .positioner {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    top:40%;
+}
+
+#modal{
+    position: relative;
+    width:400px;
+    background: #fff;
+    display: inline-block;
+    padding: 15px;
+    text-align: left;
+    border-radius: 10px;
+    box-shadow: 5px 5px 5px rgba(0,0,0,0.5);
+    opacity: 0;
+    -webkit-transform: scale(0.2);
+    -webkit-transition: all .2s ease-in-o;
+}
+
+.show #modal {
+    opacity: 1;
+    -webkit-transform: scale(1);
+    -webkit-transition: all .2s ease-in-out;
+    
+}
+
+.logbox {
+    position: relative;
+}
+
+.logbox .controls{
+    position: absolute;
+    top: -36px;
+    right: 0px;
+    font-size: 13px;
+}
+
+.logbox #messageForm{
+
+    width: 100%;
+}
+
+.logbox #messageForm p{
+    position: relative;
+
+    margin: 5px 0;
+    height: 25px;
+/*    padding:4px;*/
+}
+
+.logbox #messageForm p input{
+    -webkit-appearance: none;
+/*    position: absolute;*/
+
+}
+
+
+
+.logbox input[type="text"] {
+    position: absolute;
+    border: 1px solid #aaa;
+    border-bottom: 1px solid #eee;
+    border-right: 1px solid #eee;
+    border-radius: 3px;
+    box-shadow: inset 2px 2px 5px rgba(0,0,0,0.1);
+
+    width: auto;
+    height: 25px;
+    left: 0px;
+    right:75px;
+}
+
+.logbox input[type="submit"] {
+    display: block;
+    position: absolute;
+    right:10px;
+    top:0px;
+    width: 60px;
+    height: 25px;
+    border:0;
+    background: blue;
+    color: #fff;
+    text-transform: uppercase;
+    font-size: 12px;
+    padding: 4px;
+    font-weight: bold;
+    border-radius: 5px;
+} 
+
+.logbox input[type="submit"].inactive,
+.logbox input[type="submit"].inactive:hover {
+    
+    background-color: #ccc;
+    cursor: default;
+    -webkit-animation: none;
+    
+}
+
+@-webkit-keyframes throbglow {
+	0% {
+	    box-shadow: 0px 0px 10px rgba(0,0,200,0);
+	}
+	
+	50% {
+	    box-shadow: 0px 0px 10px rgba(0,0,200,1);
+	}
+
+	100% {
+	   box-shadow: 0px 0px 10px rgba(0,0,200,0);
+	}
+}
+
+.logbox input[type="submit"]{
+     cursor: pointer;
+     -webkit-animation-name: throbglow;
+     -webkit-animation-duration: 1s;
+     -webkit-animation-direction: alternate;
+ 	-webkit-animation-iteration-count: infinite;
+ 	-webkit-animation-timing-function: ease-in-out;
+}
+
+.logbox .viewer {
+    font-size:12px;
+}
+
+.logbox .time {
+    color: #ccc;
+    padding-right: 10px;
+}
+
+.logbox .owner {
+    padding-right:10px;
+}
+
+.logbox ul {
+    -webkit-perspective: 1000px;
+    -webkit-perspective-origin: 50% 50%;
+}
+
+.logbox li {
+    display: block;
+    font-family: courier;
+    opacity: 0;
+    -webkit-transform: rotate3d(1, 0, 0, 90deg);
+    height:0px;
+    -webkit-transition: all .2s ease-in-out;
+    -moz-transition: all .2s ease-in-out;
+    -o-transition: all .2s ease-in-out;
+    transition: all .2s ease-in-out;
+    white-space: nowrap;
+    position: relative;
+}
+
+.logbox li img {
+    display: none;
+}
+
+.logbox li:nth-child(odd){
+    background:rgba(200,200,200,0.14);
+}
+
+.colors li .time{
+    position:absolute;
+    top:0;
+    left:0;
+    width: 55em;
+}
+
+
+.logbox li .time{
+    position:absolute;
+    top:0;
+    left:0;
+    width: 75em;
+}
+
+.logbox li .owner{
+    position:absolute;
+    display: block;
+    top:0;
+    left:145px
+}
+
+.colors li .owner{
+    left:120px;
+    width: 74px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.logbox li .message{
+
+    margin: 0px 0px 4px 194px;
+    display: block;
+    white-space: normal;
+    width:auto;
+}
+
+.colors li .message {
+    margin: 0px 0px 4px 194px;
+}
+
+.logbox.showdeploy li.deploy,
+.logbox.showstage li.stage,
+.logbox.showsvn li.svn,
+.logbox.showblock li.block,
+.logbox.showmsg li.msg {
+    display: block;
+    height:auto;
+    opacity: 1;
+    -webkit-transform: rotate3d(1, 0, 0, 0deg);
+}
+
+.logbox.showdeploy.colors li.deploy,
+.logbox.showstage.colors li.stage,
+.logbox.showsvn.colors li.svn,
+.logbox.showblock.colors li.block,
+.logbox.showmsg.colors li.msg {
+    display: block;
+    height:auto;
+    opacity: 1;
+    -webkit-transform: rotate3d(1, 0, 0, 0deg);
+}
+
+.logbox .controls a{
+    opacity: 0.2;
+
+}
+
+.logbox.showdeploy .controls .deploy,
+.logbox.showstage .controls .stage,
+.logbox.showsvn .controls .svn,
+.logbox.showblock .controls .block,
+.logbox.showmsg .controls .msg {
+    opacity: 1;
+}
+
+.logbox.colors li {
+    font-family: Helvetica, arial;
+}
+
+.logbox.colors .message,
+.logbox .toggle {
+    display: inline-block;
+    background:transparent;
+    padding: 3px;
+    border-radius: 5px;
+    text-decoration: none;
+    color: #000;
+}
+
+
+.logbox a.toggle{
+    background-color: #ccc;
+}
+
+.logbox.colors .stage .message, 
+.logbox.colors a.stage {
+    background-color: #EBF9FF;
+}
+
+.logbox.colors .deploy .message, 
+.logbox.colors a.deploy {
+    background-color: #FFF5D6;
+}
+
+.logbox.colors .block .message,
+.logbox.colors a.block {
+    background-color: #F8CA42;
+    font-weight: bold;
+}
+
+.logbox.colors .msg .message,
+.logbox.colors a.msg {
+    background-color: red;
+    color: #fff;
+    font-weight: bold;
+}
+
+.logbox.colors .svn .message,
+.logbox.colors a.svn {
+    background-color: #F1F9F1;
+    color: #000;
+    font-weight: bold;
+}
+
+
+/* narrow window over rides */
+
+@media only screen and (max-width: 1424px) {
+    
+    .logbox .controls{
+        position: relative;
+        top: 0px;
+        right: 0px;
+        font-size: 10px;
+    }
+    
+    
+    .controlpanel form{
+        overflow: hidden;
+        
+    }
+ 
+    .controlpanel .panel li input {
+        display: inline;
+        font-size:14px;
+        width: 100%;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+    
+    
+    .controlpanel .info {
+        height:25px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
+
+@media only screen and (max-width: 767px) {
+	
+	.controlpanel .panel {
+        background: url(http://l.yimg.com/g/images/badge_preview_bg.gif) repeat;
+        padding: 15px;
+        border: 4px solid #eee;
+    }
+
+    .controlpanel .panel ul {
+        width: 100%;
+        padding-top:10px;
+    }
+    
+    .controlpanel .panel form{
+        width: 100%;
+    }
+
+    .controlpanel .panel li {
+        width: 100%;
+        margin: 0;
+        float: none;
+    }
+
+    .controlpanel input {
+        width:100%;
+
+    }
+
+    .controlpanel input[type="text"]{
+
+    }
+    
+    .controlpanel .info {
+        display: none;
+    }
+	
+}
+
+@media only screen and (max-width: 640px) {
+/*    .main {
+        background: red;
+    }*/
+     
+    .main .sec {
+        width: 100%;
+        padding: 0px;
+        float: none;
+        position: relative;
+    }
+
+    .main .mainlog {
+        position: relative;
+        right:0;
+        top:0;
+    }
+    
+    .logbox li .time{
+        position:absolute;
+        top:0;
+        left:0;
+        width: 20px;
+        font-size:9px;
+    }
+    
+    .logbox li .owner{
+        position:absolute;
+        top:0;
+        left:100px;
+        width: 20px;
+        font-size:9px;
+    }
+    
+    .logbox li .message{
+
+        margin: 0px 5px 4px 140px;
+        display: block;
+        white-space: normal;
+        width:auto;
+    }
+}
+
+
+
+
+
+
+

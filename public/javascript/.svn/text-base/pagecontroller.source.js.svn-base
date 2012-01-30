@@ -1,0 +1,234 @@
+/*jslint white: false, undef: true, browser: true, sloppy: true, eqeqeq: true, regexp: false, newcap: true, immed: true, onevar: false, plusplus: true maxerr: 50 */
+
+YUI.add('pagecontroller', function (Y) {
+	
+	var eventUrl = '/events',
+		lastEventId = 0,
+		POLL_INTERVAL = 100,
+		
+	
+	//event stream is a private singleton for managing the event queue	
+	eventStream = (function(){
+
+		var data = [], processedIndex = {}, lHandle = false;
+
+		function compare(a, b){
+
+			if(a.time > b.time){
+				return 1;
+			}else if(a.time < b.time){
+				return -1;
+			}else{
+				return 0;
+			}
+		}
+
+		//just in case events get out of order..
+		function sortStream(){
+
+			data.sort(compare);
+		}
+
+		return {
+
+			queue:function(e){
+				data.push(e);
+				processedIndex[e.id] = true;
+				if(lHandle){
+					lHandle.cancel();
+				}
+				lHandle = Y.later(2, this, sortStream);
+
+			},
+
+			next:function(){
+				return data.shift();
+			},
+
+			alreadyProcessed:function(id){
+			    if(id === undefined){
+			        return false;
+			    }
+				if(processedIndex[id]){
+					return true;
+				}else{
+					return false;
+				}
+			},
+
+			getLength:function(){
+				return data.length;
+			}
+		}
+
+
+	}());
+
+    /* -- private functions --*/
+    function processQueue(){
+
+		next = eventStream.next();
+        
+		if(!next){
+			return;
+		}
+
+		while (next !== undefined){
+		    
+			if(next.logLevel !== 'HIDDEN'){ //hidden events do not appear in "all" event (handled by unified log)
+				this.fire('pagecontroller:all', next);
+			}
+			this.fire('pagecontroller:' + next.source, next);
+            
+			next = eventStream.next();
+		}
+	}
+
+    function pollEvents(){
+		var newValue, oldValue, that = this;
+		var cfg = {
+			method:"get",
+			data:"data=1&lastevent=" +lastEventId,
+			on:{
+				success:function(id, o){
+				    
+				    try{
+					var resp = Y.JSON.parse(o.responseText);
+                    }catch(e){
+                        console.log(e);
+                    }
+                    
+					var i, j, thisEvent;
+					for(thisEvent in resp.events){
+						if(!eventStream.alreadyProcessed(resp.events[thisEvent].id)){
+							eventStream.queue(resp.events[thisEvent]);
+							
+							if(resp.events[thisEvent].time !== 0){ //some events are status events with no time (state info)
+								lastEventId = resp.events[thisEvent].id;
+							}else{
+							    
+							    //handle state changes
+							    
+							    switch(resp.events[thisEvent].title){
+							        
+							        case 'stagerunning':
+							            newValue = (resp.events[thisEvent].message === 'true') ? true : false;
+    								    oldValue = that.get('stageRunning');
+    								    if(oldValue !== newValue){
+    								        
+    								        that.set('stageRunning', newValue);
+    								    }
+    								    break;
+    								    
+    								case 'deployrunning':
+    								    
+    								    newValue = (resp.events[thisEvent].message === 'true') ? true : false;
+    								    oldValue = that.get('deployRunning');
+    								    if(oldValue !== newValue){
+    								        that.set('deployRunning', newValue);
+    								    }
+							            break;
+							            
+							        case 'block':
+							            oldValue = that.get('block');
+							            
+							            //refactor alert!
+							            if(resp.events[thisEvent].message === 'unblock'){
+							                if(oldValue !== that.NOBLOCK){
+							                    that.set('block', that.NOBLOCK);
+							                }
+							        
+							            }else if(resp.events[thisEvent].message === 'soft'){
+							                if(oldValue !== that.SOFTBLOCK){
+							                    that.set('block', that.SOFTBLOCK);
+							                }
+							            }else if(resp.events[thisEvent].message === 'hard'){
+							                if(oldValue !== that.HARDBLOCK){
+							                    that.set('block', that.HARDBLOCK);
+							                }
+							            }
+							            break;
+							            
+							    }
+
+							}
+						}
+					}
+                    Y.later(POLL_INTERVAL, that, pollEvents);
+					Y.later(1, that, processQueue);
+				}
+			}
+		};
+
+		Y.io(eventUrl, cfg);
+
+	}
+	
+    pageController = function(cfg){
+        this.NOBLOCK = 0;
+        this.SOFTBLOCK = 1;
+        this.HARDBLOCK = 2;
+        
+        var attrs = {
+            block:{
+    			value:this.NOBLOCK
+    		},
+    		stageRunning:{
+    			value:false
+    		},
+    		deployRunning:{
+    			value:false	
+    		}
+        };
+        
+        this.addAttrs(attrs, cfg);
+        
+        this.init = function(){
+    		lastEventId = Y.config.deployData.lastEventId;
+    		if(this.get('stageRunning')){
+    		    Y.one('body').addClass('running');
+    		}
+    		if(this.get('deployRunning')){
+    		    Y.one('body').addClass('running');
+    		}
+    		Y.later(POLL_INTERVAL, this, pollEvents);
+    	}
+    	
+    	this.on('stageRunningChange', function(e){
+    	    if(e.newVal == true){
+    	        Y.one('body').addClass('running');
+    	    }else{
+    	        Y.one('body').removeClass('running');
+    	    }
+            //
+    	});
+    	
+    	this.on('deployRunningChange', function(e){
+    	    if(e.newVal == true){
+    	        Y.one('body').addClass('running');
+    	    }else{
+    	        Y.one('body').removeClass('running');
+    	    }
+            // 
+    	});
+    	
+    	this.on('blockChange', function(e){
+    	    if(e.newVal === this.SOFTBLOCK && e.oldVal !== this.SOFTBLOCK){
+    	        Y.one('body').addClass('soft');
+    	    }else if(e.newVal == this.HARDBLOCK && e.oldVal !== this.HARDBLOCK){
+    	        Y.one('body').addClass('hard');
+    	    }else{
+    	        Y.one('body').removeClass('hard');
+    	        Y.one('body').removeClass('soft');
+    	    }
+    	})
+        
+    }
+   
+    Y.augment(pageController, Y.Attribute);
+    Y.augment(pageController, Y.EventTarget);
+	Y.pageController = pageController;
+	
+}, '0.0.1', {
+	requires: ['node', 'event-custom-base', 'io', 'json', 'oop', 'attribute']
+});

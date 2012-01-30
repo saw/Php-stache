@@ -1,0 +1,122 @@
+<?php
+
+class Controller_Block extends Controller {
+    
+    protected $block;
+    
+    const SOFT = 'soft';
+    const HARD = 'hard';
+    
+    public function __construct($request){
+        parent::__construct($request);
+        $this->data = array();
+        $this->block = new Model_Blocks();
+    }
+    
+    protected function setBlock(){
+        
+        if(!$this->request->type || !$this->request->action || !$this->request->message){
+            $this->data['status'] = 'fail';
+            $this->data['error'] = 'Malformed request, type, action and message must be set';
+            return;
+        }
+        
+        $stage = new Model_Stage();
+        $deploy = new Model_Deploy();
+        
+        if($stage->isRunning() || $deploy->isRunning()){
+            $this->data['status'] = 'fail';
+            $this->data['error'] = 'Stage or deploy in progess, you cannot stop it!';
+            return;
+        }
+        
+        switch($this->request->type){
+            case 'soft':
+                if($this->request->action == 'set'){
+                    if($this->block->softBlock){
+                        $this->data['detail'] = 'block already set';
+                    }else{
+                        $status = $this->block->setSoftBlock('saw',$this->request->message);
+                        $this->data['detail'] = 'Soft block set';
+                    }
+                    
+                    $this->data['status'] = 'ok';
+                }else{
+                    $this->block->unBlock('saw', $this->request->message);
+                }
+                break;
+            case 'hard':
+                if($this->request->action == 'set'){
+                    if($this->block->hardBlock){
+                         $this->data['detail'] = 'block already set';
+                     }else{
+                         $status = $this->block->setHardBlock('saw',$this->request->message);
+                         $this->data['detail'] = 'Hard block set';
+                     }
+
+                     $this->data['status'] = 'ok';
+                }else{
+                    $this->block->unBlock('saw', $this->request->message);
+                }
+                break;
+        }
+        
+    }
+    
+    protected function unBlock(){
+        if(!$this->request->action || !$this->request->message){
+            $this->data['status'] = 'fail';
+            $this->data['error'] = 'Malformed request, type, action and message must be set';
+            return;
+        }
+        
+        $this->block->unBlock('saw', $this->request->message);
+        $this->data['status'] = 'ok';
+        $this->data['detail'] = 'Block removed';
+    }
+
+	
+	protected function prepareData(){
+		
+		$this->data['block'] = false;
+		$this->data['deployorstage'] = false;
+		
+		if($this->request->action == 'set'){
+		    $this->setBlock();
+		    
+		}else if($this->request->action == 'unset'){
+		    $this->unBlock();
+		}
+		
+	    $block = new Model_Blocks();
+	    
+	    if($block->softBlock){
+	        $this->data['block'] = $block->softBlock;
+	        $this->data['block']['type'] = 'soft';
+	    }else if($block->hardBlock){
+	        $this->data['block'] = $block->hardBlock;
+	        $this->data['block']['type'] = 'hard';
+	    }else{
+	        $this->data['block'] = false;
+	        $stage = new Model_Stage();
+            $deploy = new Model_Deploy();
+            
+            if($stage->isRunning() || $deploy->isRunning()){
+                $this->data['deployorstage'] = true;
+                return;
+            }
+	    }
+		
+		
+		
+		$blockModule = new YuiModule('deployblock');
+		
+		$blockModule->setInitCode('Y.deployblock.init(Y.one(".blockcontrol"), PC);');
+		App::getInstance()->addYuiModule($blockModule);
+		$pagecontroller->order = 4;
+
+	}
+	
+	
+	
+}

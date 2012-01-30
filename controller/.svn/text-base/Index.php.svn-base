@@ -1,0 +1,40 @@
+<?php
+
+class Controller_Index extends Controller {
+	
+	protected function prepareData(){
+		
+		$this->data = array('title' => 'Welcome to deploy town!');
+		
+		$queryParam = $this->request->foo;
+
+
+		
+		/* load log */
+		$log = new Controller_Log($this->request);
+		$log->execute(true);
+		$this->data['log'] = $log->getView();
+		
+		$controlPanel = new Controller_ControlPanel($this->request);
+		$controlPanel->execute(true);
+		$this->data['controlPanel'] = $controlPanel->getView();
+		
+		$monitor = new Controller_Monitor($this->request);
+		$monitor->execute(true);
+		$this->data['monitor'] = $monitor->getView();
+		
+		//yeah, this is dumb. But meh.
+		$cpdata = $controlPanel->getData();
+		
+		$this->data['running'] = $cpdata['deploying'] || $cpdata['staging'];
+		
+		$this->data['blocked'] = $cpdata['blocked'];
+		
+		$this->data['user'] = $this->request->user;
+		
+
+	}
+	
+	
+	
+}

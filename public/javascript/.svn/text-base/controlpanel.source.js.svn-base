@@ -1,0 +1,152 @@
+/*jslint white: false, undef: true, browser: true, sloppy: true, eqeqeq: true, regexp: false, newcap: true, immed: true, onevar: false, plusplus: true maxerr: 50 */
+
+YUI.add('controlpanel', function (Y) {
+    
+    var pollerHandle, myNode, stageRunning, deployRunning, PC;
+    
+    
+    function refreshView(){
+        var cfg = {
+            method:'get',
+            data:'fragment=1',
+            on: {
+                success:function(id, o){
+                    var newNode = Y.Node.create(o.responseText);
+
+
+                    myNode.set('innerHTML', newNode.get('innerHTML'));
+                }
+            }
+        };
+        
+        Y.io('/controlpanel', cfg);
+    }
+    
+    function handleSubmit(e, data){
+        e.preventDefault();
+        var cfg = {
+            method:'post',
+            data:'data=1',
+            
+            form:{
+                id:e.target
+            },
+            
+            on:{
+                success:function(id, o){
+                    // console.log(o.responseText);
+                    
+                }
+            }
+        };
+        
+        if(data){
+            cfg.data = 'message=' + data;
+        }
+        console.log(e.target.getAttribute('action'));
+        Y.io(e.target.getAttribute('action'), cfg);
+        
+    }
+    
+    function syncUI(){
+        
+        if(stageRunning || deployRunning){
+            myNode.one('input.stage').setAttribute('disabled', 'true');
+            myNode.one('input.deploy').setAttribute('disabled', 'true');
+        }else{
+            myNode.one('input.stage').removeAttribute('disabled');
+            myNode.one('input.deploy').removeAttribute('disabled');
+        }
+        if(stageRunning){
+            myNode.addClass('stageRunning');
+        }else{
+            myNode.removeClass('stageRunning');
+        }
+        
+        if(deployRunning){
+
+            myNode.addClass('deployRunning');
+        }else{
+            myNode.removeClass('deployRunning');
+        }
+        
+         
+        
+    }
+    
+    function handleStateChange(e){
+        if(e.attrName == 'stageRunning'){
+            stageRunning = e.newVal;
+        }
+        
+        if(e.attrName == 'deployRunning'){
+            deployRunning = e.newVal;
+        }
+        
+        syncUI();
+    }
+
+    function init(node, controller){
+        PC = controller;
+        myNode = node;
+        
+        myNode.on('submit', function(e){
+            var id = e.target.get('id'), cfg;
+            e.preventDefault();
+            if(id.match(/block/)){
+                
+                if(id == 'softblock'){
+                    cfg = {
+                        head:'Confirm',
+                        message:'Blocking requires a message.',
+                        submit:'Soft Block', 
+                        cancel:'Never mind...'
+                    };
+                }else if(id == 'hardblock'){
+                    cfg = {
+                        head:'Confirm',
+                        message:'Blocking requires a message.',
+                        submit:'Hard Block', 
+                        cancel:'Never mind...'
+                    }; 
+                }
+                
+                if(e.target.test('.unblock')){
+                    cfg = {
+                        head:'Confirm Unblock',
+                        message: 'I hope you have a good reason for unblocking...',
+                        submit:'Unblock',
+                        cancel:'Never mind, I\'ll wait'
+                    }
+                }
+                
+                Y.modal.confirm(cfg, function(data){
+                    if(data){
+                        handleSubmit(e, data);
+                    }
+                   
+                });
+            }else{
+                handleSubmit(e);
+            }
+        });
+        
+        stageRunning = PC.get('stageRunning');
+        deployRunning = PC.get('deployRunning');
+        PC.on('stageRunningChange', handleStateChange);
+        PC.on('deployRunningChange', handleStateChange);
+        PC.on('blockChange', function(o){
+           refreshView(); 
+        });
+        
+    }
+	
+	Y.controlPanel = {
+		
+		init:init
+		
+	}
+
+}, '0.0.1', {
+	requires: ['node', 'event', 'io-form', 'pagecontroller', 'anim', 'transition', 'modal']
+});
